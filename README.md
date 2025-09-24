@@ -22,7 +22,7 @@ San Juan Sur, Corralillo, Cartago – Costa Rica.
 
 ## Contacto
 - Teléfono: (+506) 8888-8888 *(ejemplo, cambiar por el real)*  
-- Correo: contacto@agroskycr.com *(opcional)*  
+- Correo: agroskycr@gmail.com *(opcional)*  
 
 ## Tecnologías utilizadas
 - [Bootstrap 5](https://getbootstrap.com/)  
