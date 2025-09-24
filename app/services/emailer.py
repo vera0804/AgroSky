@@ -1,5 +1,4 @@
 import os, requests
-from email.message import EmailMessage  # lo puedes dejar si también tienes SMTP opcional
 
 EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "resend").lower()
 
@@ -18,8 +17,10 @@ if EMAIL_PROVIDER == "resend":
             "subject": subject,
             "html": html
         }
-        if reply_to:
-            payload["reply_to"] = reply_to   # puede ser string o lista
+
+        # solo agrega reply_to si es válido
+        if reply_to and "@" in reply_to:
+            payload["reply_to"] = reply_to
 
         resp = requests.post(
             "https://api.resend.com/emails",
@@ -31,6 +32,5 @@ if EMAIL_PROVIDER == "resend":
             timeout=15
         )
         if resp.status_code >= 400:
-            # ← muestra el mensaje específico de Resend (te dirá si es “from domain not verified”, etc.)
             raise RuntimeError(f"Resend error {resp.status_code}: {resp.text}")
         return True

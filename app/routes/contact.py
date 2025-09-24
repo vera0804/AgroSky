@@ -4,6 +4,7 @@ from pathlib import Path
 from app.services.emailer import send_email_html
 from fastapi.responses import PlainTextResponse
 import logging
+
 log = logging.getLogger("uvicorn.error")
 
 router = APIRouter(tags=["contact"])
@@ -30,10 +31,18 @@ async def contact(
         message=message.strip()
     )
 
+    # solo usar email si es válido
+    reply_to_value = email.strip() if email and "@" in email else None
+
     try:
-        send_email_html(subject=f"Contacto AgroSky: {name} - {phone}", html=html, reply_to=email)
+        send_email_html(
+            subject=f"Contacto AgroSky: {name} - {phone}",
+            html=html,
+            reply_to=reply_to_value
+        )
     except Exception as e:
-        log.exception("Fallo enviando correo") 
+        log.exception("Fallo enviando correo")
         raise HTTPException(500, f"No se pudo enviar el correo: {e}")
 
     return PlainTextResponse("OK")
+
