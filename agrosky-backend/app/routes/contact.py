@@ -5,7 +5,8 @@ from app.services.emailer import send_email_html
 
 router = APIRouter(tags=["contact"])
 
-TEMPLATE = Template(Path(__file__).resolve().parent.parent / "templates" / "contact_email.html").read_text(encoding="utf-8")
+TEMPLATE_PATH = Path(__file__).resolve().parent.parent / "templates" / "contact_email.html"
+TEMPLATE = Template(TEMPLATE_PATH.read_text(encoding="utf-8"))
 
 @router.post("/contact")
 async def contact(
@@ -14,11 +15,17 @@ async def contact(
     phone: str = Form(...),
     message: str = Form(...),
 ):
-    if len(name.strip()) < 2: raise HTTPException(400, "Nombre inválido")
-    if len(phone.strip()) < 6: raise HTTPException(400, "Teléfono inválido")
+    if len(name.strip()) < 2:
+        raise HTTPException(400, "Nombre inválido")
+    if len(phone.strip()) < 6:
+        raise HTTPException(400, "Teléfono inválido")
 
-    html = TEMPLATE.render(name=name.strip(), email=(email or "").strip() or "—",
-                           phone=phone.strip(), message=message.strip())
+    html = TEMPLATE.render(
+        name=name.strip(),
+        email=(email or "").strip() or "—",
+        phone=phone.strip(),
+        message=message.strip()
+    )
 
     try:
         send_email_html(subject=f"Contacto AgroSky: {name} - {phone}", html=html, reply_to=email)
