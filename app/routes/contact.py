@@ -1,11 +1,11 @@
+# app/routes/contact.py
 from fastapi import APIRouter, Form, HTTPException
 from jinja2 import Template
 from pathlib import Path
 from app.services.emailer import send_email_html
-from fastapi.responses import PlainTextResponse
-import logging
 
-log = logging.getLogger("uvicorn.error")
+import re
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 router = APIRouter(tags=["contact"])
 
@@ -15,7 +15,7 @@ TEMPLATE = Template(TEMPLATE_PATH.read_text(encoding="utf-8"))
 @router.post("/contact")
 async def contact(
     name: str = Form(...),
-    email: str | None = Form(None),
+    email: str | None = Form(None),   # opcional
     phone: str = Form(...),
     message: str = Form(...),
 ):
@@ -24,6 +24,10 @@ async def contact(
     if len(phone.strip()) < 6:
         raise HTTPException(400, "Teléfono inválido")
 
+    reply_to = (email or "").strip()
+    if not EMAIL_RE.match(reply_to):
+        reply_to = None                     # <- ¡clave! no mandes reply_to si no es correo válido
+
     html = TEMPLATE.render(
         name=name.strip(),
         email=(email or "").strip() or "—",
@@ -31,18 +35,17 @@ async def contact(
         message=message.strip()
     )
 
-    # solo usar email si es válido
-    reply_to_value = email.strip() if email and "@" in email else None
-
     try:
         send_email_html(
             subject=f"Contacto AgroSky: {name} - {phone}",
             html=html,
-            reply_to=reply_to_value
+            reply_to=reply_to
         )
     except Exception as e:
-        log.exception("Fallo enviando correo")
+        # deja este log si quieres, útil en Render
+        # log.exception("Fallo enviando correo")
         raise HTTPException(500, f"No se pudo enviar el correo: {e}")
 
-    return PlainTextResponse("OK")
+    return {"ok": True, "message": "Mensaje enviado"}
+
 
