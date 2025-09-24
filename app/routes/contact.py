@@ -3,6 +3,7 @@ from fastapi import APIRouter, Form, HTTPException
 from jinja2 import Template
 from pathlib import Path
 from app.services.emailer import send_email_html
+from fastapi.responses import PlainTextResponse
 
 import re
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -46,6 +47,6 @@ async def contact(
         # log.exception("Fallo enviando correo")
         raise HTTPException(500, f"No se pudo enviar el correo: {e}")
 
-    return {"ok": True, "message": "Mensaje enviado"}
+    return PlainTextResponse("OK")
 
 
