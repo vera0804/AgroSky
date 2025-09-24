@@ -15,7 +15,7 @@ Hoy ofrecemos servicios especializados que combinan experiencia agrícola con he
 - **Alejandro Rivera Araya** – Ingeniero Industrial, productor de café y viverista de aguacate. Encargado administrativo.  
 - **Ricardo Rivera Araya** – Ingeniero Agrónomo, productor de café, aguacate y cítricos. Amplia experiencia en manejo de fincas y asesoría agrícola.  
 - **Andrés Rivera Araya** – Ingeniero en Topografía, informático y piloto de dron. Productor de café.  
-- **Daniel** – Piloto de dron con experiencia en asesoría agrícola en fincas.  
+- **Daniel Monge** – Piloto de dron con experiencia en asesoría agrícola en fincas.  
 
 ## Ubicación
 San Juan Sur, Corralillo, Cartago – Costa Rica.  
