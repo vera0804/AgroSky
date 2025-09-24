@@ -4,16 +4,16 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 from dotenv import load_dotenv
-load_dotenv()
 import os
 
 from app.routes.contact import router as contact_router
 from app.routes.health import router as health_router
 
+ENV_PATH = Path(__file__).resolve().parents[1] / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
 
 app = FastAPI(title="AgroSky API + Front")
 
-# CORS (si todo corre en el mismo dominio puedes dejarlo así)
 ALLOWED_ORIGINS = os.getenv(
     "ALLOWED_ORIGINS",
     "https://www.agroskycr.com,https://agroskycr.com"
@@ -27,28 +27,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ====== Servir FRONTEND desde la raíz del repo ======
-# main.py está en .../agrosky-backend/app/main.py
-# Subimos 2 niveles para llegar a .../AgroSky
-REPO_ROOT = Path(__file__).resolve().parents[2]
+# === Directorios ===
+BACKEND_ROOT = Path(__file__).resolve().parent.parent   
+FRONT_DIR = BACKEND_ROOT / "public"                     
 
-# Montar /assets (carpeta existe en la raíz del repo)
-app.mount("/assets", StaticFiles(directory=REPO_ROOT / "assets"), name="assets")
+# Montar /assets
+if (FRONT_DIR / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=FRONT_DIR / "assets"), name="assets")
 
-# Ruta / -> index.html
+# Ruta raíz -> index.html
 @app.get("/", include_in_schema=False)
 def serve_index():
-    return FileResponse(REPO_ROOT / "index.html")
+    return FileResponse(FRONT_DIR / "index.html")
 
-# (Opcional) Fallback para servir otros archivos estáticos directos
+# Fallback para otros archivos del front
 @app.get("/{path:path}", include_in_schema=False)
 def spa_fallback(path: str):
-    candidate = REPO_ROOT / path
+    candidate = FRONT_DIR / path
     if candidate.exists() and candidate.is_file():
         return FileResponse(candidate)
-    return FileResponse(REPO_ROOT / "index.html")
+    return FileResponse(FRONT_DIR / "index.html")
 
-# ====== API ======
-app.include_router(health_router)                   # /healthz, /ping
-app.include_router(contact_router, prefix="/api")   # /api/contact
+# API
+app.include_router(health_router)
+app.include_router(contact_router, prefix="/api")
+
 

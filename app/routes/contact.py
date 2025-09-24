@@ -2,6 +2,9 @@ from fastapi import APIRouter, Form, HTTPException
 from jinja2 import Template
 from pathlib import Path
 from app.services.emailer import send_email_html
+from fastapi.responses import PlainTextResponse
+import logging
+log = logging.getLogger("uvicorn.error")
 
 router = APIRouter(tags=["contact"])
 
@@ -30,6 +33,7 @@ async def contact(
     try:
         send_email_html(subject=f"Contacto AgroSky: {name} - {phone}", html=html, reply_to=email)
     except Exception as e:
+        log.exception("Fallo enviando correo") 
         raise HTTPException(500, f"No se pudo enviar el correo: {e}")
 
-    return {"ok": True, "message": "Mensaje enviado"}
+    return PlainTextResponse("OK")
