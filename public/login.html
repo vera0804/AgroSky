@@ -35,17 +35,6 @@
 </head>
 
 <body class="index-page">
-  <!-- Header igual al de index -->
-  <!-- <header id="header" class="header d-flex align-items-center fixed-top">
-    <div class="container-fluid container-xl position-relative d-flex align-items-center">
-      <a href="index.html" class="logo d-flex align-items-center me-auto">
-        <img src="assets/img/LogoVerde.png" alt="AgroSky Logo" class="img-fluid" style="max-height: 50px;">
-      </a>
-
-      <a class="btn-getstarted" href="index.html">Inicio</a>
-    </div>
-  </header>-->
-
   <main class="main">
     <section class="login-wrapper">
       <div class="card shadow-lg border-0 rounded-4 login-card" data-aos="fade-up">
@@ -61,9 +50,9 @@
           <!-- FORM: ajusta action/method cuando tengas tu endpoint -->
           <form id="loginForm" method="POST" action="/api/auth/login" novalidate>
             <div class="mb-3">
-              <label for="username" class="form-label">Usuario o correo</label>
+              <label for="username" class="form-label">Identificación o correo</label>
               <input type="text" class="form-control" id="username" name="username" placeholder="admin@agroskycr.com" required />
-              <div class="invalid-feedback">Ingresa tu usuario o correo.</div>
+              <div class="invalid-feedback">Ingresa tu identificación o correo.</div>
             </div>
 
             <div class="mb-2">
@@ -102,62 +91,6 @@
     </section>
   </main>
 
-  <!-- Footer igual al de index -->
-  <!-- <footer id="footer" class="footer">
-    <div class="container footer-top">
-      <div class="row gy-4">
-        <div class="col-lg-4 col-md-6 footer-about">
-          <a href="index.html" class="d-flex align-items-center">
-            <img src="assets/img/LogoVerde.png" alt="AgroSky Logo" class="img-fluid" style="max-height: 50px;">
-          </a>
-          <div class="footer-contact pt-3">
-            <p>San Juan Sur, Corralillo</p>
-            <p>Cartago, Costa Rica</p>
-            <p class="mt-3"><strong>Teléfono:</strong></p>
-            <p>+506 8425-5402</p>
-            <p>+506 8340-1537</p>
-            <p>+506 8423-7760</p>
-            <p><strong>Email:</strong> <span>agroskycr@gmail.com</span></p>
-          </div>
-        </div>
-
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Enlaces útiles</h4>
-          <ul>
-            <li><i class="bi bi-chevron-right"></i> <a href="index.html">Inicio</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="index.html#about">Acerca de</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="index.html#services">Servicios</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="index.html#contact">Contacto</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Nuestros Servicios</h4>
-          <ul>
-            <li><i class="bi bi-chevron-right"></i> <a href="index.html#services">Levantamiento topográfico</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="index.html#services">Mapeo de fincas</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="index.html#services">Fumigación con dron</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="index.html#services">Asesoría agrícola</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-4 col-md-12">
-          <h4>Síguenos</h4>
-          <p>Conoce más sobre AgroSky y nuestras novedades en redes sociales.</p>
-          <div class="social-links d-flex">
-            <a href="#"><i class="bi bi-facebook"></i></a>
-            <a href="#"><i class="bi bi-instagram"></i></a>
-            <a href="#"><i class="bi bi-linkedin"></i></a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container copyright text-center mt-4">
-      <p>© <span>Copyright</span> <strong class="px-1 sitename">AgroSky Costa Rica</strong> <span>Todos los derechos reservados</span></p>
-      <div class="credits">Diseñado con plantilla <a href="https://bootstrapmade.com/">BootstrapMade</a></div>
-    </div>
-  </footer> -->
 
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
@@ -202,6 +135,45 @@
       }, false);
     })();
   </script>
+  <script>
+  // Mostrar alerta si viene ?error=...
+  (function () {
+    const params = new URLSearchParams(location.search);
+    const err = params.get('error');
+    if (err) {
+      const msg = (err === '1')
+        ? 'Credenciales inválidas. Verifica tu usuario y contraseña.'
+        : 'No se pudo iniciar sesión. Intenta nuevamente.';
+
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-danger mb-3';
+      alert.role = 'alert';
+      alert.textContent = msg;
+
+      // Inserta la alerta arriba del formulario
+      document.getElementById('loginForm').prepend(alert);
+    }
+  })();
+
+  // (Opcional) recordar el usuario que escribió si hay error:
+  (function () {
+    const form = document.getElementById('loginForm');
+    const user = document.getElementById('username');
+
+    // al enviar, guarda el username por si redirige con error
+    form.addEventListener('submit', () => {
+      sessionStorage.setItem('last_login_username', user.value);
+    });
+
+    // al cargar, repone el username y limpia
+    const last = sessionStorage.getItem('last_login_username');
+    if (last) {
+      user.value = last;
+      sessionStorage.removeItem('last_login_username');
+    }
+  })();
+</script>
+
 </body>
 </html>
 
