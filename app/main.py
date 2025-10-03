@@ -5,6 +5,9 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 from dotenv import load_dotenv
 from app.routes import auth
+
+from app.routes.diag import router as diag_router
+
 import os
 
 from app.routes.contact import router as contact_router
@@ -53,6 +56,8 @@ def spa_fallback(path: str):
 app.include_router(health_router)
 app.include_router(auth.router)
 app.include_router(contact_router, prefix="/api")
+app.include_router(diag_router)
+
 
 
 
