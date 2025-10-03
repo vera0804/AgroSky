@@ -43,6 +43,48 @@ if (FRONT_DIR / "assets").exists():
 def serve_index():
     return FileResponse(FRONT_DIR / "index.html")
 
+# ==== Diag directo en main (temporal) ====
+import urllib.request, socket
+from fastapi import HTTPException
+
+@app.get("/api/diag/outbound-ip")
+def diag_outbound_ip():
+    try:
+        with urllib.request.urlopen("https://ifconfig.me/ip", timeout=5) as r:
+            ip = r.read().decode().strip()
+        return {"ip": ip}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"no-ip: {e}")
+
+@app.get("/api/diag/db-socket")
+def diag_db_socket():
+    host = os.getenv("DB_HOST", "195.35.61.61")
+    port = int(os.getenv("DB_PORT", "3306"))
+    try:
+        s = socket.create_connection((host, port), 5)
+        peer = s.getpeername()
+        s.close()
+        return {"ok": True, "peer": peer}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"tcp-fail: {e}")
+
+from pymysql.err import OperationalError
+from app.services.db import get_conn
+
+@app.get("/api/diag/db-sql")
+def diag_db_sql():
+    try:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+                one = cur.fetchone()
+        return {"ok": True, "select1": one}
+    except OperationalError as e:
+        raise HTTPException(status_code=503, detail=f"db-unreachable: {repr(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"db-error: {repr(e)}")
+# =========================================
+
 # --- Fallback SPA (AL FINAL) ---
 # No capturar rutas del API ni docs/openapi
 EXCLUDE_PREFIXES = ("api/", "docs", "openapi.json", "redoc")
@@ -69,7 +111,4 @@ app.include_router(health_router)
 app.include_router(auth.router)
 app.include_router(contact_router, prefix="/api")
 app.include_router(diag_router)
-
-
-
 
